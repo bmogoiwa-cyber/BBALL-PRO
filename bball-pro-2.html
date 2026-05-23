@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏀 BBall Pro</title>
+<meta name="theme-color" content="#00ff87">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BBall Pro">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+:root{
+  --bg:#0a0a0f;--surface:#111118;--card:#16161f;--border:#222230;
+  --green:#00ff87;--yellow:#ffd23f;--red:#ff4757;--blue:#4ecdc4;
+  --purple:#a855f7;--orange:#ff9f43;--text:#e8e8f0;--muted:#555570;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;padding-bottom:75px;}
+
+/* HEADER */
+.hdr{background:var(--card);border-bottom:1px solid var(--border);padding:11px 14px 8px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:200;}
+.hdr-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:var(--green);}
+.hdr-right{text-align:right;}
+.hdr-bal{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--green);letter-spacing:1px;}
+.hdr-lbl{font-family:'DM Mono',monospace;font-size:0.5rem;color:var(--muted);display:block;}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);z-index:200;}
+.nb{padding:9px 2px 7px;background:none;border:none;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color 0.2s;}
+.nb.on{color:var(--green);}
+.ni{font-size:1.2rem;line-height:1;}
+.nl{font-family:'DM Mono',monospace;font-size:0.5rem;}
+
+/* PAGES */
+.page{display:none;padding:12px;animation:fi 0.2s ease;}
+.page.on{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:12px;}
+.card.cg{border-color:rgba(0,255,135,0.35);}
+.card.cy{border-color:rgba(255,210,63,0.35);}
+.card.cr{border-color:rgba(255,71,87,0.35);}
+.card.cb{border-color:rgba(78,205,196,0.35);}
+
+/* SECTION TITLE */
+.st{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--blue);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px;}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:8px;}
+
+/* STAT BOX */
+.sb{background:var(--surface);border-radius:9px;padding:9px 6px;text-align:center;border:1px solid var(--border);}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;display:block;}
+.sl{font-family:'DM Mono',monospace;font-size:0.5rem;color:var(--muted);display:block;margin-top:1px;}
+
+/* INPUTS */
+.ig{display:flex;flex-direction:column;gap:3px;margin-bottom:7px;}
+.ig label{font-family:'DM Mono',monospace;font-size:0.57rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+.ig input,.ig select,.ig textarea{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.8rem;width:100%;outline:none;transition:border-color 0.2s;}
+.ig input:focus,.ig select:focus,.ig textarea:focus{border-color:var(--green);}
+.ig textarea{resize:none;height:52px;line-height:1.5;}
+
+/* BUTTONS */
+.btn{width:100%;padding:11px;border:none;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:1.5px;cursor:pointer;margin-bottom:7px;transition:opacity 0.2s;}
+.btn:active{opacity:0.8;}
+.bg{background:var(--green);color:#000;}
+.bb{background:var(--blue);color:#000;}
+.br2{background:var(--red);color:#fff;}
+.by{background:var(--yellow);color:#000;}
+.bs{background:var(--surface);color:var(--text);border:1px solid var(--border);}
+.btn-sm{padding:5px 10px;border-radius:6px;border:none;font-family:'Bebas Neue',sans-serif;font-size:0.72rem;letter-spacing:1px;cursor:pointer;}
+
+/* TOGGLE */
+.trow{display:grid;gap:6px;margin-bottom:8px;}
+.t2{grid-template-columns:1fr 1fr;}
+.t3{grid-template-columns:1fr 1fr 1fr;}
+.t4{grid-template-columns:repeat(4,1fr);}
+.tb{padding:8px 4px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.63rem;cursor:pointer;text-align:center;transition:all 0.2s;line-height:1.3;}
+.tb.og{border-color:var(--green);background:rgba(0,255,135,0.08);color:var(--green);}
+.tb.ob{border-color:var(--blue);background:rgba(78,205,196,0.08);color:var(--blue);}
+.tb.or{border-color:var(--red);background:rgba(255,71,87,0.08);color:var(--red);}
+.tb.oy{border-color:var(--yellow);background:rgba(255,210,63,0.08);color:var(--yellow);}
+
+/* LOCK BAR */
+.lrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.llbl{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:1px;}
+.lval{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;}
+.bar{background:var(--surface);border-radius:100px;height:7px;overflow:hidden;margin-bottom:9px;border:1px solid var(--border);}
+.barf{height:100%;border-radius:100px;transition:width 0.7s,background 0.3s;}
+
+/* VERDICT */
+.verd{border-radius:9px;padding:10px 12px;border:1px solid;margin-bottom:7px;}
+.vt{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;display:block;}
+.vs{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);display:block;margin-top:3px;line-height:1.5;}
+
+/* PILLS */
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.pill{font-family:'DM Mono',monospace;font-size:0.55rem;padding:3px 8px;border-radius:100px;border:1px solid var(--border);color:var(--muted);}
+
+/* ===== GAME SLOTS ===== */
+.slots-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.slots-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--blue);}
+.slots-count{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);}
+
+.slot{background:var(--card);border:1px solid var(--border);border-radius:13px;margin-bottom:10px;overflow:hidden;transition:border-color 0.3s;}
+.slot.sg{border-color:rgba(0,255,135,0.4);}
+.slot.sy{border-color:rgba(255,210,63,0.4);}
+.slot.sr{border-color:rgba(255,71,87,0.4);}
+.slot.sb2{border-color:rgba(78,205,196,0.4);}
+.slot.empty-slot{border-style:dashed;border-color:var(--border);opacity:0.5;}
+
+/* SLOT HEADER */
+.slot-hdr{padding:9px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);}
+.slot-num{font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:1px;color:var(--muted);}
+.slot-name-input{background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-weight:500;font-size:0.8rem;flex:1;margin:0 8px;outline:none;}
+.slot-name-input::placeholder{color:var(--muted);}
+.slot-status{font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:1px;padding:3px 8px;border-radius:100px;}
+
+/* PASTE INPUT */
+.paste-zone{padding:10px 12px;border-bottom:1px solid var(--border);}
+.paste-label{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:5px;}
+.paste-row{display:flex;gap:6px;align-items:stretch;}
+.paste-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.85rem;outline:none;transition:border-color 0.2s;}
+.paste-input:focus{border-color:var(--green);}
+.parse-btn{background:var(--green);border:none;border-radius:7px;padding:9px 12px;color:#000;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:1px;cursor:pointer;white-space:nowrap;}
+.parse-btn:active{opacity:0.8;}
+
+/* PARSED PREVIEW */
+.parsed-preview{background:var(--surface);border-radius:7px;padding:8px 10px;margin-top:6px;display:none;}
+.pp-row{display:flex;justify-content:space-between;align-items:center;}
+.pp-label{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);}
+.pp-val{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;}
+
+/* SLOT SETTINGS */
+.slot-settings{padding:8px 12px;border-bottom:1px solid var(--border);}
+.slot-calc-row{padding:8px 12px;border-bottom:1px solid var(--border);}
+.slot-results{padding:11px 12px;display:none;}
+.slot-results.show{display:block;}
+
+/* GLOBAL CALC */
+.global-calc{background:var(--card);border:1px solid rgba(0,255,135,0.3);border-radius:13px;padding:13px;margin-bottom:12px;}
+.gc-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--green);margin-bottom:10px;}
+.gc-hint{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);margin-bottom:10px;line-height:1.6;background:var(--surface);padding:8px 10px;border-radius:7px;}
+
+/* GUIDE */
+.gr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);}
+.gr:last-child{border-bottom:none;}
+.glbl{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);}
+.gtag{font-family:'Bebas Neue',sans-serif;font-size:0.75rem;letter-spacing:1px;padding:3px 10px;border-radius:100px;}
+
+/* BET HISTORY */
+.bi{background:var(--surface);border-radius:9px;padding:10px 11px;margin-bottom:7px;border-left:3px solid var(--border);}
+.bi.bw{border-left-color:var(--green);}
+.bi.bl{border-left-color:var(--red);}
+.bi.bp{border-left-color:var(--yellow);}
+.bi-name{font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;}
+.bi-meta{font-family:'DM Mono',monospace;font-size:0.57rem;color:var(--muted);margin-top:2px;}
+.bi-actions{display:flex;gap:4px;margin-top:5px;}
+.ba{border-radius:5px;padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;border:1px solid;}
+
+/* H2H */
+.hi{background:var(--surface);border-radius:9px;padding:10px 11px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;}
+.hi-name{font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;}
+.hi-meta{font-family:'DM Mono',monospace;font-size:0.56rem;color:var(--muted);margin-top:2px;}
+.hi-avg{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--blue);}
+
+/* CHART */
+.cbr{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.clbl{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);width:58px;text-align:right;}
+.cbg{flex:1;background:var(--surface);border-radius:100px;height:18px;overflow:hidden;}
+.cb{height:100%;border-radius:100px;display:flex;align-items:center;padding-left:7px;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;transition:width 0.8s ease;min-width:24px;}
+.cval{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);width:32px;}
+
+.empty{text-align:center;padding:20px;color:var(--muted);}
+.ei{font-size:2rem;margin-bottom:5px;}
+.et{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:1px;}
+.divl{height:1px;background:var(--border);margin:10px 0;}
+.c-g{color:var(--green);}.c-y{color:var(--yellow);}.c-r{color:var(--red);}.c-b{color:var(--blue);}.c-p{color:var(--purple);}.c-m{color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-title">🏀 BBALL PRO</div>
+  <div class="hdr-right">
+    <div class="hdr-bal">BWP <span id="hdr-bal">0.00</span></div>
+    <span class="hdr-lbl">BALANCE</span>
+  </div>
+</div>
+
+<!-- ===== PAGE 1: LIVE TRACKER ===== -->
+<div class="page on" id="pg-live">
+
+  <!-- Global Settings -->
+  <div class="global-calc">
+    <div class="gc-title">⚡ PASTE & TRACK — UP TO 5 GAMES</div>
+    <div class="gc-hint">
+      FORMAT: paste score like <strong style="color:var(--green)">35-10</strong> and minutes played like <strong style="color:var(--green)">15</strong> into each game slot below. Model calculates everything automatically.
+    </div>
+
+    <!-- Global defaults -->
+    <div class="g3" style="margin-bottom:8px;">
+      <div class="ig" style="margin-bottom:0;">
+        <label>Default Duration</label>
+        <select id="g-dur" onchange="updateAllDur()">
+          <option value="40">40 min (NBL)</option>
+          <option value="48">48 min (NBA)</option>
+        </select>
+      </div>
+      <div class="ig" style="margin-bottom:0;">
+        <label>Default Stake BWP</label>
+        <input type="number" id="g-stake" placeholder="10" oninput="updateAllStake()">
+      </div>
+      <div class="ig" style="margin-bottom:0;">
+        <label>Default Odds</label>
+        <input type="number" id="g-odds" placeholder="1.85" step="0.01" oninput="updateAllOdds()">
+      </div>
+    </div>
+
+    <!-- Session summary -->
+    <div class="g5" id="session-summary" style="display:none;">
+      <div class="sb"><span class="sv c-b" id="ss-t">0</span><span class="sl">ACTIVE</span></div>
+      <div class="sb"><span class="sv c-g" id="ss-s">0</span><span class="sl">SAFE</span></div>
+      <div class="sb"><span class="sv c-y" id="ss-c">0</span><span class="sl">CAUTION</span></div>
+      <div class="sb"><span class="sv c-r" id="ss-d">0</span><span class="sl">DANGER</span></div>
+      <div class="sb"><span class="sv c-p" id="ss-p">BWP 0</span><span class="sl">POT.WIN</span></div>
+    </div>
+  </div>
+
+  <!-- 5 GAME SLOTS -->
+  <div id="slots-container"></div>
+
+</div>
+
+<!-- ===== PAGE 2: PRE-MATCH ===== -->
+<div class="page" id="pg-pre">
+  <div class="card cb" style="margin-bottom:10px;">
+    <div class="gc-hint" style="margin-bottom:0;">💡 Enter Line + H2H Average. Gap 11+ = good value. 30+ = premium 💎. Model tells you UNDER or OVER.</div>
+  </div>
+  <div id="pre-summary" style="display:none;" class="g4" style="margin-bottom:12px;">
+    <div class="sb"><span class="sv c-p" id="ps-p">0</span><span class="sl">PREMIUM</span></div>
+    <div class="sb"><span class="sv c-g" id="ps-g">0</span><span class="sl">GOOD</span></div>
+    <div class="sb"><span class="sv c-y" id="ps-w">0</span><span class="sl">WEAK</span></div>
+    <div class="sb"><span class="sv c-r" id="ps-a">0</span><span class="sl">AVOID</span></div>
+  </div>
+  <button class="btn bb" style="margin-bottom:12px;" onclick="addPre()">+ ADD PRE-MATCH GAME</button>
+  <div id="pre-cards"></div>
+</div>
+
+<!-- ===== PAGE 3: BANKROLL ===== -->
+<div class="page" id="pg-bank">
+  <div class="card cg">
+    <div class="st">💰 BANKROLL</div>
+    <div class="g3">
+      <div class="sb" style="border-color:rgba(0,255,135,0.3);"><span class="sv c-g" id="bal-main">0.00</span><span class="sl">BALANCE BWP</span></div>
+      <div class="sb"><span class="sv" id="bal-profit">+0.00</span><span class="sl">NET PROFIT</span></div>
+      <div class="sb"><span class="sv" id="bal-roi">0%</span><span class="sl">ROI</span></div>
+    </div>
+    <div class="g2" style="margin-bottom:0;">
+      <div class="ig" style="margin-bottom:0;"><label>Current Balance BWP</label><input type="number" id="bal-inp" placeholder="93.01"></div>
+      <div class="ig" style="margin-bottom:0;"><label>Starting Balance BWP</label><input type="number" id="start-inp" placeholder="42.00"></div>
+    </div>
+    <div style="height:8px;"></div>
+    <button class="btn bg" style="margin-bottom:0;" onclick="setBalance()">UPDATE BALANCE</button>
+  </div>
+
+  <div class="card">
+    <div class="st">📝 LOG BET</div>
+    <div class="ig"><label>Teams</label><input type="text" id="lg-name" placeholder="Jets vs Rams"></div>
+    <div class="g3">
+      <div class="ig" style="margin-bottom:0;"><label>Stake BWP</label><input type="number" id="lg-stake" placeholder="10"></div>
+      <div class="ig" style="margin-bottom:0;"><label>Odds</label><input type="number" id="lg-odds" placeholder="1.85" step="0.01"></div>
+      <div class="ig" style="margin-bottom:0;"><label>Line</label><input type="number" id="lg-line" placeholder="201.5"></div>
+    </div>
+    <div style="height:7px;"></div>
+    <div class="trow t3">
+      <button class="tb og" id="lt-u" onclick="setLT('under')">⬇ UNDER</button>
+      <button class="tb" id="lt-o" onclick="setLT('over')">⬆ OVER</button>
+      <button class="tb" id="lt-x" onclick="setLT('other')">OTHER</button>
+    </div>
+    <div class="trow t3" style="margin-bottom:0;">
+      <button class="tb oy" id="lr-p" onclick="setLR('pending')">⏳ PENDING</button>
+      <button class="tb" id="lr-w" onclick="setLR('win')">✅ WIN</button>
+      <button class="tb" id="lr-l" onclick="setLR('loss')">❌ LOSS</button>
+    </div>
+    <div style="height:8px;"></div>
+    <button class="btn bg" style="margin-bottom:0;" onclick="logBet()">LOG BET</button>
+  </div>
+
+  <div class="card">
+    <div class="st">📋 HISTORY <button class="btn-sm bs" onclick="clearBets()">CLEAR ALL</button></div>
+    <div id="bet-hist"><div class="empty"><div class="ei">📋</div><div class="et">NO BETS LOGGED</div></div></div>
+  </div>
+</div>
+
+<!-- ===== PAGE 4: H2H DATABASE ===== -->
+<div class="page" id="pg-h2h">
+  <div class="card cb">
+    <div class="st">➕ SAVE TEAM H2H</div>
+    <div class="ig"><label>Teams</label><input type="text" id="hh-t" placeholder="Jets vs Rams"></div>
+    <div class="g3">
+      <div class="ig" style="margin-bottom:0;"><label>H2H Avg</label><input type="number" id="hh-a" placeholder="169"></div>
+      <div class="ig" style="margin-bottom:0;"><label>League</label><input type="text" id="hh-l" placeholder="NBL"></div>
+      <div class="ig" style="margin-bottom:0;"><label>Games</label><input type="number" id="hh-g" placeholder="10"></div>
+    </div>
+    <div style="height:8px;"></div>
+    <button class="btn bb" style="margin-bottom:0;" onclick="saveH2H()">SAVE</button>
+  </div>
+  <div class="ig"><label>🔍 Search</label><input type="text" id="hh-s" placeholder="Search teams..." oninput="renderH2H()"></div>
+  <div id="h2h-list"><div class="empty"><div class="ei">📊</div><div class="et">NO TEAMS SAVED</div></div></div>
+</div>
+
+<!-- ===== PAGE 5: STATS & GUIDE ===== -->
+<div class="page" id="pg-stats">
+  <div class="card">
+    <div class="st">📈 PERFORMANCE</div>
+    <div class="g4">
+      <div class="sb"><span class="sv c-g" id="st-w">0</span><span class="sl">WINS</span></div>
+      <div class="sb"><span class="sv c-r" id="st-l">0</span><span class="sl">LOSSES</span></div>
+      <div class="sb"><span class="sv c-b" id="st-r">0%</span><span class="sl">WIN RATE</span></div>
+      <div class="sb"><span class="sv c-p" id="st-t">0</span><span class="sl">TOTAL</span></div>
+    </div>
+    <div class="g3">
+      <div class="sb"><span class="sv c-b" id="st-sk">0</span><span class="sl">STAKED</span></div>
+      <div class="sb"><span class="sv c-g" id="st-rt">0</span><span class="sl">RETURNED</span></div>
+      <div class="sb"><span class="sv" id="st-ri">0%</span><span class="sl">ROI</span></div>
+    </div>
+    <div id="perf-chart"><div class="empty"><div class="et">LOG BETS TO SEE CHART</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="st">🔒 LOCK SCORE</div>
+    <div class="gr"><span class="glbl">Below 85</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">VERY SAFE ✅</span></div>
+    <div class="gr"><span class="glbl">85 – 94</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">SAFE ✅</span></div>
+    <div class="gr"><span class="glbl">95 – 99</span><span class="gtag" style="background:rgba(255,210,63,0.1);color:var(--yellow)">CAUTION 🟡</span></div>
+    <div class="gr"><span class="glbl">100+</span><span class="gtag" style="background:rgba(255,71,87,0.1);color:var(--red)">DANGER 🔴</span></div>
+  </div>
+
+  <div class="card">
+    <div class="st">💎 H2H GAP VALUE</div>
+    <div class="gr"><span class="glbl">0–5 pts</span><span class="gtag" style="background:rgba(255,71,87,0.1);color:var(--red)">AVOID ❌</span></div>
+    <div class="gr"><span class="glbl">6–10 pts</span><span class="gtag" style="background:rgba(255,210,63,0.1);color:var(--yellow)">WEAK ⚠️</span></div>
+    <div class="gr"><span class="glbl">11–20 pts</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">GOOD ✅</span></div>
+    <div class="gr"><span class="glbl">21–30 pts</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">STRONG 🔥</span></div>
+    <div class="gr"><span class="glbl">30+ pts</span><span class="gtag" style="background:rgba(78,205,196,0.1);color:var(--blue)">PREMIUM 💎</span></div>
+  </div>
+
+  <div class="card">
+    <div class="st">📈 POINTS RANGES</div>
+    <div class="gr"><span class="glbl">Below 160</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">STRONG UNDER</span></div>
+    <div class="gr"><span class="glbl">161–170</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">UNDER LEAN</span></div>
+    <div class="gr"><span class="glbl">171–180</span><span class="gtag" style="background:rgba(255,210,63,0.1);color:var(--yellow)">LINE ZONE</span></div>
+    <div class="gr"><span class="glbl">181–191</span><span class="gtag" style="background:rgba(255,71,87,0.1);color:var(--red)">OVER LEAN</span></div>
+    <div class="gr"><span class="glbl">191+</span><span class="gtag" style="background:rgba(255,71,87,0.1);color:var(--red)">STRONG OVER</span></div>
+  </div>
+
+  <div class="card">
+    <div class="st">⏱ QUARTER TRENDS</div>
+    <div class="gr"><span class="glbl">1st Quarter</span><span style="font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--red)">4.5–5.5 PPM · Fastest</span></div>
+    <div class="gr"><span class="glbl">2nd Quarter</span><span style="font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--yellow)">4.0–4.5 PPM · Slows</span></div>
+    <div class="gr"><span class="glbl">Halftime Drop</span><span style="font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--green)">10–15% slower 2nd half</span></div>
+    <div class="gr"><span class="glbl">3rd Quarter</span><span style="font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--yellow)">4.25–4.75 PPM</span></div>
+    <div class="gr"><span class="glbl">4th Quarter</span><span style="font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--green)">3.5–4.25 PPM · Slowest</span></div>
+  </div>
+
+  <div class="card cg">
+    <div class="st">👑 GOLDEN RULES</div>
+    <div class="gr"><span class="glbl">Singles only — NEVER accas</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">RULE 1</span></div>
+    <div class="gr"><span class="glbl">H2H gap 11+ minimum</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">RULE 2</span></div>
+    <div class="gr"><span class="glbl">2nd half always slows</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">RULE 3</span></div>
+    <div class="gr"><span class="glbl">Lock below 95 = hold</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">RULE 4</span></div>
+    <div class="gr"><span class="glbl">Wins outnumber losses</span><span class="gtag" style="background:rgba(0,255,135,0.1);color:var(--green)">RULE 5</span></div>
+    <div class="gr"><span class="glbl">Never chase losses</span><span class="gtag" style="background:rgba(255,71,87,0.1);color:var(--red)">NEVER</span></div>
+    <div class="gr"><span class="glbl">Math over emotion</span><span class="gtag" style="background:rgba(78,205,196,0.1);color:var(--blue)">ALWAYS</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nb on" onclick="goTo('live',this)"><span class="ni">⚡</span><span class="nl">LIVE</span></button>
+  <button class="nb" onclick="goTo('pre',this)"><span class="ni">🔍</span><span class="nl">PRE</span></button>
+  <button class="nb" onclick="goTo('bank',this)"><span class="ni">💰</span><span class="nl">BANK</span></button>
+  <button class="nb" onclick="goTo('h2h',this)"><span class="ni">📊</span><span class="nl">H2H</span></button>
+  <button class="nb" onclick="goTo('stats',this)"><span class="ni">📈</span><span class="nl">STATS</span></button>
+</div>
+
+<script>
+// ========== STORAGE ==========
+const S={
+  get:(k,d)=>{try{const v=localStorage.getItem('bp2_'+k);return v?JSON.parse(v):d;}catch(e){return d;}},
+  set:(k,v)=>{try{localStorage.setItem('bp2_'+k,JSON.stringify(v));}catch(e){}}
+};
+
+// ========== NAV ==========
+function goTo(pg,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+pg).classList.add('on');
+  if(btn)btn.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function updateHdrBal(){
+  document.getElementById('hdr-bal').textContent=parseFloat(S.get('balance',0)).toFixed(2);
+}
+
+// ========== SLOT STATE ==========
+const MAX_SLOTS = 5;
+let slots = {};
+
+// ========== BUILD SLOTS ==========
+function buildSlots(){
+  const container = document.getElementById('slots-container');
+  container.innerHTML = '';
+  for(let i=1;i<=MAX_SLOTS;i++){
+    slots[i] = {
+      bt:'under', dur:40, stake:10, odds:1.85, h2h:null, line:null, calc:false,
+      name:'', score1:0, score2:0, played:0
+    };
+    container.appendChild(createSlot(i));
+  }
+}
+
+function createSlot(i){
+  const div = document.createElement('div');
+  div.className = 'slot';
+  div.id = 'slot-'+i;
+  div.innerHTML = `
+    <div class="slot-hdr">
+      <span class="slot-num">GAME ${i}</span>
+      <input class="slot-name-input" id="sn-${i}" type="text" placeholder="Team A vs Team B">
+      <span class="slot-status" id="ss-badge-${i}" style="display:none;background:var(--surface);color:var(--muted);">—</span>
+    </div>
+
+    <!-- PASTE ZONE -->
+    <div class="paste-zone">
+      <span class="paste-label">📋 Paste score & time from bookmaker</span>
+      <div class="paste-row">
+        <input class="paste-input" id="paste-score-${i}" type="text" placeholder="35-10" maxlength="12">
+        <input class="paste-input" id="paste-min-${i}" type="number" placeholder="min played" style="max-width:110px;">
+        <button class="parse-btn" onclick="parseSlot(${i})">GO ▶</button>
+      </div>
+      <div class="parsed-preview" id="pp-${i}">
+        <div class="pp-row">
+          <span class="pp-label">TOTAL PTS</span><span class="pp-val c-g" id="pp-pts-${i}">—</span>
+        </div>
+        <div class="pp-row">
+          <span class="pp-label">PPM</span><span class="pp-val c-b" id="pp-ppm-${i}">—</span>
+        </div>
+        <div class="pp-row">
+          <span class="pp-label">PROJECTED</span><span class="pp-val" id="pp-proj-${i}">—</span>
+        </div>
+        <div class="pp-row">
+          <span class="pp-label">REMAINING</span><span class="pp-val c-y" id="pp-rem-${i}">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="slot-settings">
+      <div class="g3" style="margin-bottom:7px;">
+        <div class="ig" style="margin-bottom:0;"><label>Bet Line</label><input type="number" id="sl-${i}" placeholder="e.g. 201.5" oninput="autoSlot(${i})"></div>
+        <div class="ig" style="margin-bottom:0;"><label>H2H Avg</label><input type="number" id="sh-${i}" placeholder="e.g. 169" oninput="autoSlot(${i})"></div>
+        <div class="ig" style="margin-bottom:0;">
+          <label>Duration</label>
+          <select id="sd-${i}" onchange="slots[${i}].dur=parseInt(this.value);autoSlot(${i});">
+            <option value="40">40 min</option>
+            <option value="48">48 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2" style="margin-bottom:7px;">
+        <div class="ig" style="margin-bottom:0;"><label>Stake BWP</label><input type="number" id="ssk-${i}" placeholder="10" value="10" oninput="autoSlot(${i})"></div>
+        <div class="ig" style="margin-bottom:0;"><label>Odds</label><input type="number" id="sod-${i}" placeholder="1.85" value="1.85" step="0.01" oninput="autoSlot(${i})"></div>
+      </div>
+      <div class="trow t2" style="margin-bottom:0;">
+        <button class="tb og" id="sbu-${i}" onclick="setSlotBet(${i},'under')">⬇ UNDER</button>
+        <button class="tb" id="sbo-${i}" onclick="setSlotBet(${i},'over')">⬆ OVER</button>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="slot-results" id="sr-${i}"></div>
+  `;
+  return div;
+}
+
+// ========== PARSE SLOT ==========
+function parseSlot(i){
+  const scoreRaw = document.getElementById('paste-score-'+i).value.trim();
+  const minRaw = parseFloat(document.getElementById('paste-min-'+i).value);
+  const line = parseFloat(document.getElementById('sl-'+i).value);
+  const h2h = parseFloat(document.getElementById('sh-'+i).value)||null;
+  const dur = parseInt(document.getElementById('sd-'+i).value)||40;
+  const stk = parseFloat(document.getElementById('ssk-'+i).value)||10;
+  const odds = parseFloat(document.getElementById('sod-'+i).value)||1.85;
+  const bt = slots[i].bt;
+
+  // Parse score X-Y
+  const match = scoreRaw.match(/(\d+)[^\d]+(\d+)/);
+  if(!match){alert('Format: enter score like 35-10');return;}
+  const s1=parseInt(match[1]),s2=parseInt(match[2]);
+  const totalPts=s1+s2;
+
+  if(!minRaw||isNaN(minRaw)){alert('Enter minutes played');return;}
+  if(!line){alert('Enter bet line');return;}
+
+  slots[i]={...slots[i],score1:s1,score2:s2,played:minRaw,dur,stk,odds,line,h2h,bt,calc:true};
+
+  const rem=Math.max(0,dur-minRaw);
+  const ppm=totalPts/minRaw;
+  const proj=totalPts+(ppm*rem);
+  const lock=(proj/line)*100;
+  const budget=line-totalPts;
+  const ret=(stk*odds).toFixed(2);
+  const prof=((stk*odds)-stk).toFixed(2);
+
+  // Show preview
+  const pp=document.getElementById('pp-'+i);
+  pp.style.display='block';
+  document.getElementById('pp-pts-'+i).textContent=totalPts+' pts ('+s1+'+'+s2+')';
+  const ppmEl=document.getElementById('pp-ppm-'+i);
+  ppmEl.textContent=ppm.toFixed(2)+' PPM';
+  ppmEl.style.color=ppm>4.75?'var(--red)':ppm>4.0?'var(--yellow)':'var(--green)';
+  const projEl=document.getElementById('pp-proj-'+i);
+  projEl.textContent='~'+Math.round(proj)+' pts';
+  projEl.style.color=(bt==='under'&&proj>line)||(bt==='over'&&proj<line)?'var(--red)':'var(--green)';
+  document.getElementById('pp-rem-'+i).textContent=rem+' min left';
+
+  // H2H gap
+  let gapH='';
+  if(h2h){
+    const gap=Math.abs(line-h2h);
+    const dir=line>h2h?'UNDER':'OVER';
+    const gc=gap<=5?'var(--red)':gap<=10?'var(--yellow)':gap<=20?'var(--green)':gap<=30?'var(--green)':'var(--blue)';
+    const gl=gap<=5?'AVOID':gap<=10?'WEAK':gap<=20?'GOOD':gap<=30?'STRONG 🔥':'PREMIUM 💎';
+    gapH=`<span class="pill" style="border-color:${gc};color:${gc}">H2H ${gap.toFixed(1)}pts · ${gl} · ${dir}</span>`;
+  }
+
+  // Quarter context
+  const pct=minRaw/dur;
+  let qi='';
+  if(pct<=0.25)qi='Q1 — pace drops Q2';
+  else if(pct<=0.5)qi='Halftime — 10–15% slower 2nd half';
+  else if(pct<=0.75)qi='Q3 — 4th quarter slowest';
+  else qi='Q4 — fouls & clock slow pace';
+
+  let lc,bw,em,vt,vs,cls,badgeTxt,badgeCol;
+  if(bt==='under'){
+    if(lock<85){lc='var(--green)';bw=lock+'%';em='✅';vt='UNDER — VERY SAFE';vs=`~${Math.round(proj)} projected · ${Math.round(line-proj)}pt cushion · ${rem}min left`;cls='sg';badgeTxt='SAFE';badgeCol='var(--green)';}
+    else if(lock<95){lc='var(--green)';bw=lock+'%';em='✅';vt='UNDER — SAFE';vs=`~${Math.round(proj)} projected vs ${line} · comfortable`;cls='sg';badgeTxt='SAFE';badgeCol='var(--green)';}
+    else if(lock<100){lc='var(--yellow)';bw='96%';em='🟡';vt='UNDER — TIGHT BUT HOLDING';vs=`~${Math.round(proj)} projected vs ${line} · needs slowdown`;cls='sy';badgeTxt='CAUTION';badgeCol='var(--yellow)';}
+    else{lc='var(--red)';bw='100%';em='🔴';vt='UNDER — DANGER!';vs=`~${Math.round(proj)} EXCEEDS ${line} · cashout if available`;cls='sr';badgeTxt='DANGER';badgeCol='var(--red)';}
+  }else{
+    if(lock>115){lc='var(--green)';bw='100%';em='✅';vt='OVER — VERY SAFE';vs=`~${Math.round(proj)} vs ${line} · well above`;cls='sg';badgeTxt='SAFE';badgeCol='var(--green)';}
+    else if(lock>105){lc='var(--green)';bw='90%';em='✅';vt='OVER — SAFE';vs=`~${Math.round(proj)} vs ${line} · comfortable`;cls='sg';badgeTxt='SAFE';badgeCol='var(--green)';}
+    else if(lock>100){lc='var(--yellow)';bw='75%';em='🟡';vt='OVER — TIGHT';vs=`~${Math.round(proj)} vs ${line} · pace must hold`;cls='sy';badgeTxt='CAUTION';badgeCol='var(--yellow)';}
+    else{lc='var(--red)';bw='50%';em='🔴';vt='OVER — FALLING SHORT';vs=`~${Math.round(proj)} vs ${line} · pace needs boost`;cls='sr';badgeTxt='DANGER';badgeCol='var(--red)';}
+  }
+
+  // Update slot
+  document.getElementById('slot-'+i).className='slot '+cls;
+  const badge=document.getElementById('ss-badge-'+i);
+  badge.style.display='inline-block';
+  badge.textContent=badgeTxt;
+  badge.style.background=badgeCol+'22';
+  badge.style.color=badgeCol;
+  badge.style.border='1px solid '+badgeCol;
+
+  document.getElementById('sr-'+i).className='slot-results show';
+  document.getElementById('sr-'+i).innerHTML=`
+    <div class="lrow"><span class="llbl">🔒 LOCK SCORE</span><span class="lval" style="color:${lc}">${lock.toFixed(1)}</span></div>
+    <div class="bar"><div class="barf" style="width:${bw};background:${lc}"></div></div>
+    <div class="g5">
+      <div class="sb"><span class="sv" style="color:${ppm>4.75?'var(--red)':ppm>4.0?'var(--yellow)':'var(--green)'}">${ppm.toFixed(1)}</span><span class="sl">PPM</span></div>
+      <div class="sb"><span class="sv" style="color:${(bt==='under'&&proj>line)||(bt==='over'&&proj<line)?'var(--red)':'var(--green)'}">~${Math.round(proj)}</span><span class="sl">PROJ</span></div>
+      <div class="sb"><span class="sv" style="color:${budget<15?'var(--red)':budget<30?'var(--yellow)':'var(--green)'}">${Math.round(budget)}</span><span class="sl">BUDGET</span></div>
+      <div class="sb"><span class="sv c-y">${rem}</span><span class="sl">MIN LEFT</span></div>
+      <div class="sb"><span class="sv c-b">BWP ${ret}</span><span class="sl">RETURN</span></div>
+    </div>
+    <div class="verd" style="background:${lc}12;border-color:${lc}">
+      <span class="vt" style="color:${lc}">${em} ${vt}</span>
+      <span class="vs">${vs}</span>
+    </div>
+    <div class="pills"><span class="pill">⏱ ${qi}</span>${gapH}<span class="pill">Score: ${s1}–${s2}</span></div>
+  `;
+  updateSessionSummary();
+}
+
+function autoSlot(i){if(slots[i]&&slots[i].calc)parseSlot(i);}
+
+function setSlotBet(i,t){
+  slots[i].bt=t;
+  document.getElementById('sbu-'+i).className='tb'+(t==='under'?' og':'');
+  document.getElementById('sbo-'+i).className='tb'+(t==='over'?' or':'');
+  if(slots[i].calc)parseSlot(i);
+}
+
+function updateAllDur(){
+  const dur=document.getElementById('g-dur').value;
+  for(let i=1;i<=MAX_SLOTS;i++){
+    const sel=document.getElementById('sd-'+i);
+    if(sel)sel.value=dur;
+    slots[i].dur=parseInt(dur);
+  }
+}
+
+function updateAllStake(){
+  const stk=document.getElementById('g-stake').value;
+  for(let i=1;i<=MAX_SLOTS;i++){
+    const inp=document.getElementById('ssk-'+i);
+    if(inp&&!inp.value)inp.value=stk;
+  }
+}
+
+function updateAllOdds(){
+  const odds=document.getElementById('g-odds').value;
+  for(let i=1;i<=MAX_SLOTS;i++){
+    const inp=document.getElementById('sod-'+i);
+    if(inp&&inp.value==='1.85')inp.value=odds;
+  }
+}
+
+function updateSessionSummary(){
+  let safe=0,caut=0,dang=0,active=0,potWin=0;
+  for(let i=1;i<=MAX_SLOTS;i++){
+    const sl=document.getElementById('slot-'+i);
+    if(!sl)continue;
+    if(sl.classList.contains('sg')){safe++;active++;potWin+=parseFloat(slots[i].stk||10)*parseFloat(slots[i].odds||1.85);}
+    else if(sl.classList.contains('sy')){caut++;active++;}
+    else if(sl.classList.contains('sr')){dang++;active++;}
+  }
+  document.getElementById('ss-t').textContent=active;
+  document.getElementById('ss-s').textContent=safe;
+  document.getElementById('ss-c').textContent=caut;
+  document.getElementById('ss-d').textContent=dang;
+  document.getElementById('ss-p').textContent='BWP '+potWin.toFixed(0);
+  document.getElementById('session-summary').style.display=active>0?'grid':'none';
+}
+
+// ========== PRE-MATCH ==========
+let pc=0,pbt={};
+function addPre(){
+  if(pc>=5){alert('Max 5 pre-match games');return;}
+  pc++;const id=pc;pbt[id]='under';
+  const d=document.createElement('div');
+  d.className='slot';d.id='pre-'+id;
+  d.innerHTML=`
+    <div class="slot-hdr">
+      <span class="slot-num">GAME ${id}</span>
+      <input class="slot-name-input" id="pn-${id}" type="text" placeholder="Team A vs Team B">
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;" onclick="this.closest('.slot').remove();pc--;updatePS();">✕</button>
+    </div>
+    <div style="padding:10px 12px;border-bottom:1px solid var(--border);">
+      <div class="g2" style="margin-bottom:7px;">
+        <div class="ig" style="margin-bottom:0;"><label>Betway Line</label><input type="number" id="pl-${id}" placeholder="188.5"></div>
+        <div class="ig" style="margin-bottom:0;"><label>H2H Average</label><input type="number" id="ph-${id}" placeholder="176"></div>
+      </div>
+      <div class="g2" style="margin-bottom:7px;">
+        <div class="ig" style="margin-bottom:0;"><label>Stake BWP</label><input type="number" id="psk-${id}" placeholder="10"></div>
+        <div class="ig" style="margin-bottom:0;"><label>Odds</label><input type="number" id="pod-${id}" placeholder="1.85" step="0.01"></div>
+      </div>
+      <div class="trow t2" style="margin-bottom:7px;">
+        <button class="tb og" id="pbu-${id}" onclick="setPB(${id},'under')">⬇ UNDER</button>
+        <button class="tb" id="pbo-${id}" onclick="setPB(${id},'over')">⬆ OVER</button>
+      </div>
+      <button class="btn bb" style="margin-bottom:0;" onclick="calcPre(${id})">🔍 ANALYSE</button>
+    </div>
+    <div class="slot-results" id="pr-${id}"></div>
+  `;
+  document.getElementById('pre-cards').appendChild(d);
+  updatePS();
+  setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function setPB(id,t){pbt[id]=t;document.getElementById('pbu-'+id).className='tb'+(t==='under'?' og':'');document.getElementById('pbo-'+id).className='tb'+(t==='over'?' or':'');}
+
+function calcPre(id){
+  const line=parseFloat(document.getElementById('pl-'+id).value);
+  const h2h=parseFloat(document.getElementById('ph-'+id).value);
+  const stk=parseFloat(document.getElementById('psk-'+id).value)||10;
+  const odds=parseFloat(document.getElementById('pod-'+id).value)||1.85;
+  const bt=pbt[id]||'under';
+  if(!line||!h2h){alert('Enter Line and H2H Average');return;}
+
+  const gap=Math.abs(line-h2h);
+  const dir=line>h2h?'UNDER':'OVER';
+  const ret=(stk*odds).toFixed(2);
+  const prof=((stk*odds)-stk).toFixed(2);
+  const dm=bt.toUpperCase()===dir;
+
+  let vc,vl,bw,em,vt,vs,cls;
+  if(gap<=5){vc='var(--red)';vl='AVOID';bw='8%';em='❌';vt='DO NOT BET';vs='Gap too small — no edge vs bookmaker';cls='sr';}
+  else if(gap<=10){vc='var(--yellow)';vl='WEAK VALUE';bw='28%';em='⚠️';vt='WEAK — MIN STAKE ONLY';vs=`Gap ${gap.toFixed(1)}pts — small edge`;cls='sy';}
+  else if(gap<=20){vc='var(--green)';vl='GOOD VALUE ✅';bw='55%';em='✅';vt='GOOD VALUE — BET NORMALLY';vs=`Gap ${gap.toFixed(1)}pts — solid edge`;cls='sg';}
+  else if(gap<=30){vc='var(--green)';vl='STRONG 🔥';bw='78%';em='🔥';vt='STRONG VALUE — BET CONFIDENTLY';vs=`Gap ${gap.toFixed(1)}pts — strong edge`;cls='sg';}
+  else{vc='var(--blue)';vl='PREMIUM 💎';bw='100%';em='💎';vt='PREMIUM — MAX CONFIDENCE';vs=`Gap ${gap.toFixed(1)}pts — rare premium edge!`;cls='sb2';}
+
+  let rng='';
+  if(h2h<160)rng='H2H below 160 → Strong Under range';
+  else if(h2h<=170)rng='H2H 161–170 → Under Lean';
+  else if(h2h<=180)rng='H2H 171–180 → Line Zone';
+  else if(h2h<=191)rng='H2H 181–191 → Over Lean';
+  else rng='H2H 191+ → Strong Over range';
+
+  document.getElementById('pre-'+id).className='slot '+cls;
+  document.getElementById('pr-'+id).className='slot-results show';
+  document.getElementById('pr-'+id).innerHTML=`
+    <div style="padding:0 12px 12px;">
+      <div class="lrow"><span class="llbl">💎 VALUE</span><span class="lval" style="color:${vc};font-size:1.1rem;">${vl}</span></div>
+      <div class="bar"><div class="barf" style="width:${bw};background:${vc}"></div></div>
+      <div class="g3">
+        <div class="sb"><span class="sv" style="color:${vc}">${gap.toFixed(1)}</span><span class="sl">GAP PTS</span></div>
+        <div class="sb"><span class="sv c-b">${dir}</span><span class="sl">MATH SAYS</span></div>
+        <div class="sb"><span class="sv" style="color:${dm?'var(--green)':'var(--yellow)'}">${dm?'✅ OK':'⚠️ CHECK'}</span><span class="sl">DIRECTION</span></div>
+      </div>
+      <div class="g3">
+        <div class="sb"><span class="sv c-b">BWP ${stk}</span><span class="sl">STAKE</span></div>
+        <div class="sb"><span class="sv c-g">BWP ${ret}</span><span class="sl">RETURN</span></div>
+        <div class="sb"><span class="sv c-g">BWP ${prof}</span><span class="sl">PROFIT</span></div>
+      </div>
+      <div class="verd" style="background:${vc}12;border-color:${vc}">
+        <span class="vt" style="color:${vc}">${em} ${vt}</span>
+        <span class="vs">${vs}</span>
+      </div>
+      <div class="pills"><span class="pill">📊 ${rng}</span><span class="pill">Line ${line} · H2H ${h2h}</span><span class="pill" style="color:${dm?'var(--green)':'var(--yellow)'};">${dm?'✅ Direction confirmed':'⚠️ Check direction'}</span></div>
+    </div>
+  `;
+  updatePS();
+}
+
+function updatePS(){
+  const cards=document.querySelectorAll('#pre-cards .slot');
+  let p=0,g=0,w=0,a=0;
+  cards.forEach(c=>{if(c.classList.contains('sb2'))p++;else if(c.classList.contains('sg'))g++;else if(c.classList.contains('sy'))w++;else if(c.classList.contains('sr'))a++;});
+  const t=cards.length;
+  document.getElementById('ps-p').textContent=p;
+  document.getElementById('ps-g').textContent=g;
+  document.getElementById('ps-w').textContent=w;
+  document.getElementById('ps-a').textContent=a;
+  document.getElementById('pre-summary').style.display=t>0?'grid':'none';
+}
+
+// ========== BANKROLL ==========
+let lgT='under',lgR='pending';
+function setLT(t){lgT=t;['u','o','x'].forEach(x=>document.getElementById('lt-'+x).className='tb'+(x[0]===t[0]?' og':''));}
+function setLR(r){lgR=r;document.getElementById('lr-p').className='tb'+(r==='pending'?' oy':'');document.getElementById('lr-w').className='tb'+(r==='win'?' og':'');document.getElementById('lr-l').className='tb'+(r==='loss'?' or':'');}
+
+function setBalance(){
+  const bal=parseFloat(document.getElementById('bal-inp').value);
+  const start=parseFloat(document.getElementById('start-inp').value);
+  if(!bal){alert('Enter balance');return;}
+  S.set('balance',bal);
+  if(start)S.set('startBal',start);
+  else if(!S.get('startBal',null))S.set('startBal',bal);
+  renderBank();updateHdrBal();
+  document.getElementById('bal-inp').value='';
+  document.getElementById('start-inp').value='';
+}
+
+function logBet(){
+  const name=document.getElementById('lg-name').value||'Unknown';
+  const stake=parseFloat(document.getElementById('lg-stake').value)||0;
+  const odds=parseFloat(document.getElementById('lg-odds').value)||1.85;
+  const line=parseFloat(document.getElementById('lg-line').value)||0;
+  if(!stake){alert('Enter stake');return;}
+  const bets=S.get('bets',[]);
+  const b={id:Date.now(),name,type:lgT,stake,odds,line,result:lgR,date:new Date().toLocaleDateString(),potential:parseFloat((stake*odds).toFixed(2))};
+  bets.unshift(b);S.set('bets',bets);
+  let bal=S.get('balance',0);
+  if(lgR==='win')bal=parseFloat((bal+b.potential).toFixed(2));
+  else if(lgR==='loss')bal=parseFloat((bal-stake).toFixed(2));
+  S.set('balance',bal);
+  renderBank();renderStats();updateHdrBal();
+  document.getElementById('lg-name').value='';
+  document.getElementById('lg-stake').value='';
+  document.getElementById('lg-line').value='';
+}
+
+function clearBets(){if(confirm('Clear bet history?')){S.set('bets',[]);renderBank();renderStats();}}
+
+function updateBetResult(id,result){
+  const bets=S.get('bets',[]);
+  const b=bets.find(x=>x.id===id);if(!b)return;
+  let bal=S.get('balance',0);
+  if(b.result==='win')bal=parseFloat((bal-b.potential).toFixed(2));
+  else if(b.result==='loss')bal=parseFloat((bal+b.stake).toFixed(2));
+  b.result=result;
+  if(result==='win')bal=parseFloat((bal+b.potential).toFixed(2));
+  else if(result==='loss')bal=parseFloat((bal-b.stake).toFixed(2));
+  S.set('balance',bal);S.set('bets',bets);
+  renderBank();renderStats();updateHdrBal();
+}
+
+function renderBank(){
+  const bal=S.get('balance',0);
+  const start=S.get('startBal',bal);
+  const profit=bal-start;
+  const bets=S.get('bets',[]);
+  const staked=bets.reduce((s,b)=>s+b.stake,0);
+  const roi=staked>0?Math.round((profit/staked)*100):0;
+  document.getElementById('bal-main').textContent=parseFloat(bal).toFixed(2);
+  const pe=document.getElementById('bal-profit');
+  pe.textContent=(profit>=0?'+':'')+parseFloat(profit).toFixed(2);
+  pe.style.color=profit>=0?'var(--green)':'var(--red)';
+  const re=document.getElementById('bal-roi');
+  re.textContent=(roi>=0?'+':'')+roi+'%';
+  re.style.color=roi>=0?'var(--green)':'var(--red)';
+  const hist=document.getElementById('bet-hist');
+  if(!bets.length){hist.innerHTML='<div class="empty"><div class="ei">📋</div><div class="et">NO BETS LOGGED</div></div>';return;}
+  hist.innerHTML=bets.map(b=>`
+    <div class="bi ${b.result==='win'?'bw':b.result==='loss'?'bl':'bp'}">
+      <div style="flex:1;">
+        <div class="bi-name">${b.name}</div>
+        <div class="bi-meta">${b.type.toUpperCase()} · Odds ${b.odds}${b.line?' · Line '+b.line:''} · ${b.date}</div>
+        <div class="bi-actions">
+          <button class="ba" onclick="updateBetResult(${b.id},'win')" style="background:rgba(0,255,135,0.12);border-color:var(--green);color:var(--green);">WIN</button>
+          <button class="ba" onclick="updateBetResult(${b.id},'loss')" style="background:rgba(255,71,87,0.12);border-color:var(--red);color:var(--red);">LOSS</button>
+          <button class="ba" onclick="updateBetResult(${b.id},'pending')" style="background:rgba(255,210,63,0.12);border-color:var(--yellow);color:var(--yellow);">PENDING</button>
+        </div>
+      </div>
+      <div style="text-align:right;min-width:75px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:${b.result==='win'?'var(--green)':b.result==='loss'?'var(--red)':'var(--yellow)'};">BWP ${b.result==='win'?b.potential:b.result==='loss'?b.stake:b.potential}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:${b.result==='win'?'var(--green)':b.result==='loss'?'var(--red)':'var(--yellow)'};">${b.result==='win'?'WON ✅':b.result==='loss'?'LOST ❌':'PENDING ⏳'}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.5rem;color:var(--muted);margin-top:2px;">Staked BWP ${b.stake}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ========== H2H ==========
+function saveH2H(){
+  const teams=document.getElementById('hh-t').value.trim();
+  const avg=parseFloat(document.getElementById('hh-a').value);
+  const league=document.getElementById('hh-l').value||'—';
+  const games=parseInt(document.getElementById('hh-g').value)||10;
+  if(!teams||!avg){alert('Enter teams and average');return;}
+  const db=S.get('h2hdb',[]);
+  db.unshift({id:Date.now(),teams,avg,league,games,date:new Date().toLocaleDateString()});
+  S.set('h2hdb',db);renderH2H();
+  document.getElementById('hh-t').value='';
+  document.getElementById('hh-a').value='';
+  document.getElementById('hh-l').value='';
+  document.getElementById('hh-g').value='';
+}
+
+function delH2H(id){S.set('h2hdb',S.get('h2hdb',[]).filter(h=>h.id!==id));renderH2H();}
+
+function renderH2H(){
+  const q=document.getElementById('hh-s')?.value?.toLowerCase()||'';
+  let db=S.get('h2hdb',[]);
+  if(q)db=db.filter(h=>h.teams.toLowerCase().includes(q)||h.league.toLowerCase().includes(q));
+  const list=document.getElementById('h2h-list');
+  if(!db.length){list.innerHTML='<div class="empty"><div class="ei">📊</div><div class="et">NO TEAMS SAVED</div></div>';return;}
+  list.innerHTML=db.map(h=>{
+    let rng='',rc='var(--muted)';
+    if(h.avg<160){rng='Strong Under';rc='var(--green)';}
+    else if(h.avg<=170){rng='Under Lean';rc='var(--green)';}
+    else if(h.avg<=180){rng='Line Zone';rc='var(--yellow)';}
+    else if(h.avg<=191){rng='Over Lean';rc='var(--red)';}
+    else{rng='Strong Over';rc='var(--red)';}
+    return `<div class="hi">
+      <div style="flex:1;">
+        <div class="hi-name">${h.teams}</div>
+        <div class="hi-meta">${h.league} · ${h.games} games · ${h.date}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.57rem;color:${rc};margin-top:2px;">${rng}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="hi-avg">${h.avg}</div>
+        <button onclick="delH2H(${h.id})" style="background:none;border:none;color:var(--muted);font-size:0.62rem;cursor:pointer;margin-top:3px;">✕ remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ========== STATS ==========
+function renderStats(){
+  const bets=S.get('bets',[]).filter(b=>b.result!=='pending');
+  const wins=bets.filter(b=>b.result==='win').length;
+  const losses=bets.filter(b=>b.result==='loss').length;
+  const total=wins+losses;
+  const rate=total>0?Math.round((wins/total)*100):0;
+  const staked=bets.reduce((s,b)=>s+b.stake,0);
+  const returned=bets.filter(b=>b.result==='win').reduce((s,b)=>s+b.potential,0);
+  const roi=staked>0?Math.round(((returned-staked)/staked)*100):0;
+  document.getElementById('st-w').textContent=wins;
+  document.getElementById('st-l').textContent=losses;
+  const re=document.getElementById('st-r');re.textContent=rate+'%';re.style.color=rate>=55?'var(--green)':rate>=45?'var(--yellow)':'var(--red)';
+  document.getElementById('st-t').textContent=total;
+  document.getElementById('st-sk').textContent=staked.toFixed(0);
+  document.getElementById('st-rt').textContent=returned.toFixed(0);
+  const ri=document.getElementById('st-ri');ri.textContent=(roi>=0?'+':'')+roi+'%';ri.style.color=roi>=0?'var(--green)':'var(--red)';
+  const chart=document.getElementById('perf-chart');
+  if(!total){chart.innerHTML='<div class="empty"><div class="et">LOG BETS TO SEE CHART</div></div>';return;}
+  const ww=Math.round((wins/total)*100),lw=Math.round((losses/total)*100);
+  chart.innerHTML=`
+    <div style="height:8px;"></div>
+    <div class="cbr"><span class="clbl">WINS</span><div class="cbg"><div class="cb" style="width:${ww}%;background:var(--green);color:#000;">${wins}</div></div><span class="cval">${ww}%</span></div>
+    <div class="cbr"><span class="clbl">LOSSES</span><div class="cbg"><div class="cb" style="width:${lw}%;background:var(--red);">${losses}</div></div><span class="cval">${lw}%</span></div>
+    <div class="cbr"><span class="clbl">WIN RATE</span><div class="cbg"><div class="cb" style="width:${rate}%;background:${rate>=55?'var(--green)':rate>=45?'var(--yellow)':'var(--red)'};color:#000;">${rate}%</div></div><span class="cval">${rate>=55?'✅':'⚠️'}</span></div>
+    <div style="height:8px;"></div>
+    <div style="background:${rate>=55?'rgba(0,255,135,0.05)':'rgba(255,71,87,0.05)'};border:1px solid ${rate>=55?'var(--green)':'var(--red)'};border-radius:8px;padding:10px 12px;">
+      <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);margin-bottom:3px;">TARGET: 55%+ WIN RATE</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;color:${rate>=55?'var(--green)':'var(--red)'};">${rate>=55?'✅ ON TARGET — SYSTEM WORKING':'⚠️ BELOW TARGET — REVIEW PICKS'}</div>
+    </div>
+  `;
+}
+
+// ========== INIT ==========
+buildSlots();
+renderBank();
+renderH2H();
+renderStats();
+updateHdrBal();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
